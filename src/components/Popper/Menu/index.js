@@ -34,7 +34,8 @@ function Menu({ items = [], children, onChange = () => {} }) {
     return (
         <Tippy
             interactive
-            delay={[0, 700]}
+            delay={[0, 500]}
+            offset={[12, 8]}
             placement="bottom-end"
             render={(attrs) => (
                 <div className={cx('menu-list')} tabIndex="-1" {...attrs}>
@@ -51,6 +52,11 @@ function Menu({ items = [], children, onChange = () => {} }) {
                     </PopperWrapper>
                 </div>
             )}
+            // When menu is hidden, reset to the first level
+            onHide={() => {
+                console.log('Menu is on hide');
+                setHistory((prev) => prev.slice(0, 1));
+            }}
         >
             {children}
         </Tippy>
