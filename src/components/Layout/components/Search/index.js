@@ -9,7 +9,7 @@ import { Wrapper as PopperWrapper } from '~/components/Popper';
 import styles from './Search.module.scss';
 const cx = classNames.bind(styles);
 function Search() {
-    /* Process icon clear */
+    /* UI Process icon clear */
     const [searchValue, setSearchValue] = useState('');
     const inputRef = useRef();
     const handleClear = () => {
@@ -18,17 +18,35 @@ function Search() {
         inputRef.current.focus();
     };
 
-    /* Process search result */
+    /* UI Process loading */
+    const [loading, setLoading] = useState(false);
+
+    /* UI Process search result */
     const [showResult, setShowResult] = useState(true);
     const handleHideResult = () => setShowResult(false);
     const handleInputFocus = () => setShowResult(true);
 
+    /* API search result call */
     const [searchResult, setSearchResult] = useState([]);
     useEffect(() => {
-        setTimeout(() => {
-            setSearchResult([1, 2]);
-        }, 0);
-    }, []);
+        if (!searchValue.trim()) {
+            setSearchResult([]);
+            return;
+        }
+
+        // set loading
+        setLoading(true);
+
+        fetch(`https://tiktok.fullstack.edu.vn/api/users/search?q=${encodeURIComponent(searchValue)}&type=less`)
+            .then((res) => res.json())
+            .then((res) => {
+                setSearchResult(res.data);
+                setLoading(false);
+            })
+            .catch(() => {
+                setLoading(false);
+            });
+    }, [searchValue]);
     return (
         <HeadlessTippy
             interactive="true"
@@ -37,10 +55,9 @@ function Search() {
                 <div className={cx('search-result')} tabIndex="-1" {...attrs}>
                     <PopperWrapper>
                         <h4 className={cx('search-title')}>Accounts</h4>
-                        <AccountItem></AccountItem>
-                        <AccountItem></AccountItem>
-                        <AccountItem></AccountItem>
-                        <AccountItem></AccountItem>
+                        {searchResult.map((account, index) => (
+                            <AccountItem key={account.id} data={account} />
+                        ))}
                     </PopperWrapper>
                 </div>
             )}
@@ -55,12 +72,12 @@ function Search() {
                     onChange={(e) => setSearchValue(e.target.value)}
                     onFocus={handleInputFocus}
                 />
-                {!!searchValue && (
+                {!!searchValue && !loading && (
                     <button className={cx('clear')} onClick={handleClear}>
                         <FontAwesomeIcon icon={faCircleXmark} />
                     </button>
                 )}
-                {/* <FontAwesomeIcon className={cx('loading')} icon={faSpinner} /> */}
+                {loading && <FontAwesomeIcon className={cx('loading')} icon={faSpinner} />}
                 <button className={cx('search-btn')}>
                     <SearchIcon />
                 </button>
