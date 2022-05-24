@@ -8,6 +8,8 @@ import { SearchIcon } from '~/components/Icons';
 import { Wrapper as PopperWrapper } from '~/components/Popper';
 import styles from './Search.module.scss';
 import { useDebounce } from '~/hooks';
+import * as searchServices from '~/apiServices/searchServices';
+
 const cx = classNames.bind(styles);
 function Search() {
     /* UI Process icon clear */
@@ -37,17 +39,18 @@ function Search() {
         }
 
         // set loading
-        setLoading(true);
+        const fetchApi = async () => {
+            try {
+                setLoading(true);
+                const result = await searchServices.search(debounced);
+                setSearchResult(result);
+                setLoading(false);
+            } catch (error) {
+                setLoading(false);
+            }
+        };
 
-        fetch(`https://tiktok.fullstack.edu.vn/api/users/search?q=${encodeURIComponent(debounced)}&type=less`)
-            .then((res) => res.json())
-            .then((res) => {
-                setSearchResult(res.data);
-                setLoading(false);
-            })
-            .catch(() => {
-                setLoading(false);
-            });
+        fetchApi();
     }, [debounced]);
     return (
         <HeadlessTippy
