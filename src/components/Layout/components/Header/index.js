@@ -1,32 +1,25 @@
-import classNames from 'classnames/bind';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
-    faCircleXmark,
-    faSpinner,
-    faMagnifyingGlass,
-    faSignIn,
-    faEllipsisVertical,
-    faGlobe,
     faCircleQuestion,
-    faKeyboard,
-    faCloudUpload,
-    faMessage,
-    faUser,
     faCoins,
+    faEllipsisVertical,
     faGear,
+    faGlobe,
+    faKeyboard,
     faSignOut,
+    faUser,
 } from '@fortawesome/free-solid-svg-icons';
-
-// import Tippy from '@tippyjs/react';
-import HeadlessTippy from '@tippyjs/react/headless'; // different import path!
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Tippy from '@tippyjs/react'; // different import path!
-import 'tippy.js/dist/tippy.css'; // optional
+import classNames from 'classnames/bind';
 import { useEffect, useState } from 'react';
-import styles from './Header.module.scss';
+import 'tippy.js/dist/tippy.css'; // optional
 import images from '~/assets/images';
-import { Menu, Wrapper as PopperWrapper } from '~/components/Popper';
-import AccountItem from '~/components/AccountItem';
 import Button from '~/components/Button';
+import { InboxIcon, MessageIcon, UploadIcon } from '~/components/Icons';
+import Image from '~/components/Image';
+import { Menu } from '~/components/Popper';
+import Search from '../Search';
+import styles from './Header.module.scss';
 
 const cx = classNames.bind(styles);
 
@@ -62,13 +55,6 @@ const MENU_ITEMS = [
 ];
 
 function Header() {
-    const [searchResult, setSearchResult] = useState([]);
-    useEffect(() => {
-        setTimeout(() => {
-            setSearchResult([]);
-        }, 0);
-    }, []);
-
     const handleMenuChange = (menuItem) => {
         switch (menuItem) {
             case 'language':
@@ -110,44 +96,26 @@ function Header() {
                 <div className={cx('logo')}>
                     <img src={images.logo} alt="Tictoc" />
                 </div>
-                <HeadlessTippy
-                    interactive="true"
-                    visible={searchResult.length > 0}
-                    render={(attrs) => (
-                        <div className={cx('search-result')} tabIndex="-1" {...attrs}>
-                            <PopperWrapper>
-                                <h4 className={cx('search-title')}>Accounts</h4>
-                                <AccountItem></AccountItem>
-                                <AccountItem></AccountItem>
-                                <AccountItem></AccountItem>
-                                <AccountItem></AccountItem>
-                            </PopperWrapper>
-                        </div>
-                    )}
-                >
-                    <div className={cx('search')}>
-                        <input placeholder="Search accounts and videos" spellCheck="false" />
-                        <button className={cx('clear')}>
-                            <FontAwesomeIcon icon={faCircleXmark} />
-                        </button>
-                        <FontAwesomeIcon className={cx('loading')} icon={faSpinner} />
-                        <button className={cx('search-btn')}>
-                            <FontAwesomeIcon icon={faMagnifyingGlass} />
-                        </button>
-                    </div>
-                </HeadlessTippy>
+                {/* Search */}
+                <Search />
 
                 <div className={cx('actions')}>
                     {currentUser ? (
                         <>
                             <Tippy delay={[0, 200]} content={'Upload Video'} placement="bottom">
                                 <button className={cx('action-btn')}>
-                                    <FontAwesomeIcon icon={faCloudUpload} />
+                                    <UploadIcon />
                                 </button>
                             </Tippy>
                             <Tippy content={'Message'} placement="bottom">
                                 <button className={cx('action-btn')}>
-                                    <FontAwesomeIcon icon={faMessage} />
+                                    <MessageIcon />
+                                </button>
+                            </Tippy>
+                            <Tippy content={'Inbox'} placement="bottom">
+                                <button className={cx('action-btn')}>
+                                    <InboxIcon />
+                                    <span className={cx('badge')}>12</span>
                                 </button>
                             </Tippy>
                         </>
@@ -166,10 +134,11 @@ function Header() {
                     {/* Show more button when not yet login */}
                     <Menu items={!currentUser ? MENU_ITEMS : userMenu} onChange={handleMenuChange}>
                         {currentUser ? (
-                            <img
+                            <Image
                                 src="https://p77-sign-va.tiktokcdn.com/tos-maliva-avt-0068/235409ab36b0531ee42013689aac26be~c5_100x100.jpeg?x-expires=1653487200&x-signature=INjtFFldnflLf3gkGStpOjophA0%3D"
                                 className={cx('user-avatar')}
                                 alt="Nguyen Van A"
+                                // fallback="https://static.fullstack.edu.vn/static/media/f8-icon.7ad2b161d5e80c87e516.png"
                             />
                         ) : (
                             <button className={cx('more-btn')}>
